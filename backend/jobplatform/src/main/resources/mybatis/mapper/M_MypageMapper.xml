@@ -1,0 +1,270 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="jobplatform.fo.user.domain.mapper.M_MypageMapper">
+
+	<!-- @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@마이페이지 메인 화면START@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ -->
+
+	<!-- 회원 정보 중 이름, 전화번호, 이메일, 포지션 제안 수락여부 -->
+	<select id="getMbrInfo">
+		SELECT mbr_name, mbr_mp, mbr_eml_adrs, pstn_prpsl_accept_yn
+		FROM p2_tbl_member_m
+		WHERE
+			mbr_sq = #{mbr_sq}
+	</select>
+	<!-- 이력서 중 대표 이력서 이력서 순번, 이력서 제목, 등록일시, 최종 수정일시, 이미지 -->
+	<select id="getRprsntvRsmInfo">
+		SELECT rsm_sq, rsm_tl, insrt_dtm, updt_dtm, rsm_img_file_url
+		FROM p2_tbl_resume_m
+		WHERE 
+			mbr_sq = #{mbr_sq}
+			AND
+			rsm_rprsntv_yn = 'Y'
+	</select>
+	<!--
+	카사디안 곱 결과물 만들고 where절 비교할듯.. 즉 성능면에서 더 떨어질 듯...
+	<select>
+	    SELECT 
+	        m.mbr_name, m.mbr_mp, m.mbr_eml_adrs, m.pstn_prpsl_accept_yn, r.rsm_sq, r.rsm_tl, r.insrt_dtm, r.updt_dtm, r.rsm_img_file_rul
+	    FROM 
+	        p2_tbl_member_m m
+	    	LEFT JOIN p2_tbl_resume_m r ON m.mbr_sq = r.mbr_sq AND r.rsm_rprsntv_yn = 'Y'
+	    WHERE
+	        m.mbr_sq = #{mbr_sq}
+	</select>
+	-->
+	
+
+
+
+	<!--대표 이력서 -> 지원 테이블에서 각 상태별 데이터 개수 가지고 오기(미열람:401, 열람:402, 면접대기:405, 면접완료:406, 합격:407, 불합격:408) -->
+	<select id="getEachCndtnApplyCount">
+		<!-- SELECT apy_cndtn, COUNT(*)
+		FROM p2_tbl_apply_h
+		WHERE
+			rsm_sq = #{rsm_sq}
+		GROUP BY apy_cndtn -->
+		SELECT
+			SUM(CASE WHEN apy_cndtn = 401 THEN 1 ELSE 0 END) AS cndtn_401,
+			SUM(CASE WHEN apy_cndtn = 402 THEN 1 ELSE 0 END) AS cndtn_401,
+			SUM(CASE WHEN apy_cndtn = 405 THEN 1 ELSE 0 END) AS cndtn_405,
+			SUM(CASE WHEN apy_cndtn = 406 THEN 1 ELSE 0 END) AS cndtn_406,
+			SUM(CASE WHEN apy_cndtn = 407 THEN 1 ELSE 0 END) AS cndtn_407,
+			SUM(CASE WHEN apy_cndtn = 408 THEN 1 ELSE 0 END) AS cndtn_408
+		FROM p2_tbl_apply_h
+		WHERE
+			rsm_sq = #{rsm_sq}
+	</select>
+	
+
+
+	<!-- 등록한 이력서 개수(rsm_cnt), 스크랩한 공고 개수(scrap_cnt), 포지션 제안 받은 개수(대가 상태(301)인 제안)(prpsl_cnt), (추후 AI추천 공고 개수) -->
+	<select id="getMyState">
+		SELECT
+			(SELECT COUNT(*) FROM p2_tbl_resume_m WHERE mbr_sq = #{mbr_sq} AND use_yn = 'Y') rsm_cnt,
+			(SELECT COUNT(*) FROM p2_tbl_scrap_s WHERE mbr_sq = #{mbr_sq}) scrap_cnt,
+			(SELECT COUNT(*) FROM p2_tbl_position_proposal_m WHERE rsm_sq = #{rsm_sq} AND pstn_prpsl_cndtn = 301) prpsl_cnt
+		FROM dual
+	</select>
+
+
+
+	<!--
+	월별 스크랩한 공고 마감일자 : S
+	월별 면접일자 면접대기(405) I
+	웗별 제안 받은 포지션 대기 상태일 때 마감 일자 PP
+	월별 지원 공고 데이터 AC
+	s.mbr_sq = #{mbr_sq} 서브쿼리로 빼서 필터링 한다음 조인하는게 좋을까?--> 
+	<select id="getToMakeCalendarData">
+		SELECT "S" tbl_type, j.jbp_sq, j.jbp_tl, j.regstr_dln_dtm as dtm
+		FROM p2_tbl_scrap_s s,
+			 p2_tbl_job_posting_m j
+		WHERE
+			s.mbr_sq = #{mbr_sq}
+			AND
+			s.jbp_sq = j.jbp_sq
+			AND
+			MONTH(j.regstr_dln_dtm) = #{month}
+		UNION
+		SELECT "I" tbl_type, j.jbp_sq, j.jbp_tl, a.intv_dtm as dtm
+		FROM p2_tbl_apply_h a,
+			 p2_tbl_job_posting_m j
+		WHERE
+			a.rsm_sq = #{rsm_sq}
+			AND
+			apy_cndtn = 405
+			AND
+			MONTH(intv_dtm) = #{month}
+		UNION
+		SELECT "PP" tbl_type, j.jbp_sq, j.jbp_tl, j.regstr_dln_dtm as dtm
+		FROM p2_tbl_position_proposal_m p,
+			 p2_tbl_job_posting_m j
+		WHERE 
+			p.rsm_sq=#{rsm_sq}
+			AND
+			MONTH(j.regstr_dln_dtm) = #{month}
+		UNION
+		SELECT  "AC" tbl_type, j.jbp_sq, j.jbp_tl, a.apy_dtm as dtm
+		FROM p2_tbl_apply_h a,
+			 p2_tbl_job_posting_m j
+		WHERE
+			a.rsm_sq IN (SELECT rsm_sq FROM p2_tbl_resume_m WHERE mbr_sq = #{mbr_sq})
+			AND
+			MONTH(a.apy_dtm) = #{month}
+	</select>  
+
+	<!-- @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@마이페이지 메인 화면END@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ -->
+
+
+
+
+	<!-- @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@마이페이지 포지션제안 받기 화면START@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ -->
+
+	<!-- 포지션 제안 수락 여부 CHECK -->
+	<select id="getPstnPrpslAcceptYN">
+		SELECT pstn_prpsl_accept_yn FROM p2_tbl_member_m WHERE mbr_sq = #{mbr_sq}
+	</select>
+
+	<!-- 포지션 제안 수락 여부 변경 -->
+	<update id="updatePstnPrpslAcceptYN">
+		UPDATE p2_tbl_member_m SET pstn_prpsl_accept_yn = #{pstn_prpsl_accept_yn} WHERE mbr_sq = #{mbr_sq}
+	</update>
+
+	<!-- 지역 코드 정보 -->
+	<select id="getAreaCodes">
+		SELECT * FROM p2_tbl_area_code_s
+	</select>
+
+	<!-- 직업 코드 정보 -->
+	<select id="getJobCodes">
+		SELECT * FROM p2_tbl_job_code_s
+	</select>
+
+	<!-- 설정했던 지역 검색 -->
+	<select id="getSelectedAreas">
+		SELECT area_sq FROM p2_tbl_area_member_r WHERE mbr_sq = #{mbr_sq}
+	</select>
+
+	<!-- 선택했던 지역 초기화(insert 전에 항상 수행) -->
+	<delete id="resetSelectedAreas">
+		DELETE FROM p2_tbl_area_member_r WHERE mbr_sq = #{mbr_sq}
+	</delete>
+
+	<!-- 선택한 지역 INSERT -->
+	<insert id="insertSelectAreas">
+		INSERT INTO p2_tbl_area_member_r (mbr_sq, area_sq)
+		VALUES
+		<foreach collection="areas" item="area" separator=",">
+			(#{mbr_sq}, #{area})
+		</foreach>
+	</insert>
+
+	<!-- 설정했던 직업 검색 -->
+	<select id="getSelectedJobs">
+		SELECT job_sq FROM p2_tbl_job_member_r WHERE mbr_sq = #{mbr_sq}
+	</select>
+
+	<!-- 선택했던 직업 초기화(insert 전에 항상 수행) -->
+	<delete id="resetSelectedJobs">
+		DELETE FROM p2_tbl_job_member_r WHERE mbr_sq = #{mbr_sq}
+	</delete>
+
+	<!-- 선택한 직업 INSERT -->
+	<insert id="insertSelectJobs">
+		INSERT INTO p2_tbl_job_member_r (mbr_sq, job_sq)
+		VALUES
+		<foreach collection="jobs" item="job" separator=",">
+			(#{mbr_sq}, #{job})
+		</foreach>
+	</insert>
+
+	<!-- @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@마이페이지 포지션제안 받기 화면END@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ -->
+
+
+	<!-- @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@마이페이지 제안 받은 포지션 리스트 화면 START@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ -->
+	<!-- 바로 아래 select 실행 결과 받을 resultMap -->
+	<resultMap id="jobPostingResultMap" type="jobplatform.fo.user.domain.vo.M_JobPosting_pp">
+        <id property="jbp_sq" column="jbp_sq"/>
+        <result property="entrprs_sq" column="entrprs_sq"/>
+        <result property="jbp_tl" column="jbp_tl"/>
+        <result property="jbp_cntnt" column="jbp_cntnt"/>
+        <result property="cr" column="cr"/>
+        <result property="edctn" column="edctn"/>
+        <result property="regstr_dln_dtm" column="regstr_dln_dtm"/>
+        <result property="pstn_prpsl_sq" column="pstn_prpsl_sq"/>
+        <result property="pstn_prpsl_cndtn" column="pstn_prpsl_cndtn"/>
+        <result property="prpsl_dtm" column="prpsl_dtm"/>
+        <result property="entrprs_name" column="entrprs_name"/>
+        <collection property="area_sq" ofType="java.lang.Integer">
+            <result column="area_sq"/>
+        </collection>
+        <collection property="job_sq" ofType="java.lang.Integer">
+            <result column="job_sq"/>
+        </collection>
+        <collection property="skl_cd_sq" ofType="java.lang.Integer">
+            <result column="skl_cd_sq"/>
+        </collection>
+    </resultMap>
+
+
+	<select id="getPPJopPostingData" resultMap="jobPostingResultMap">
+		SELECT 
+			sjp.jbp_sq, sjp.entrprs_sq, sjp.jbp_tl, sjp.jbp_cntnt, sjp.cr, sjp.edctn, sjp.regstr_dln_dtm, sjp.pstn_prpsl_sq, sjp.pstn_prpsl_cndtn,
+			sjp.prpsl_dtm, em.entrprs_name, apr.area_sq, jpr.job_sq, spr.skl_cd_sq
+		FROM 
+			(SELECT 
+				jp.jbp_sq, jp.entrprs_sq, jp.jbp_tl, jp.jbp_cntnt, jp.cr, jp.edctn, jp.regstr_dln_dtm, pp.pstn_prpsl_sq, pp.pstn_prpsl_cndtn, pp.prpsl_dtm
+			FROM
+				p2_tbl_job_posting_m jp, p2_tbl_position_proposal_m pp
+			WHERE 
+				jp.jbp_sq IN (SELECT jbp_sq FROM p2_tbl_position_proposal_m WHERE rsm_sq = #{rsm_sq} AND pstn_prpsl_cndtn = 301)) sjp
+		LEFT OUTER JOIN p2_tbl_enterprise_member_m em ON sjp.entrprs_sq = em.entrprs_sq
+		LEFT OUTER JOIN p2_tbl_area_posting_r apr ON sjp.jbp_sq = apr.jbp_sq
+		LEFT OUTER JOIN p2_tbl_job_posting_r jpr ON sjp.jbp_sq = jpr.jbp_sq
+		LEFT OUTER JOIN p2_tbl_skill_code_posting_r spr ON sjp.jbp_sq = spr.jbp_sq
+		ORDER BY sjp.prpsl_dtm DESC
+	</select>
+
+	<!-- @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@마이페이지 제안 받은 포지션 리스트 화면 END@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ -->
+
+
+	<!-- @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@tools START@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ -->
+
+	<!-- mbr_sq로 대표 rsm_sq 구하기 -->
+	<select id="getRRsm_sq">
+		SELECT rsm_sq FROM p2_tbl_resume_m WHERE mbr_sq = #{mbr_sq} AND rsm_rprsntv_yn = 'Y'
+	</select>
+
+	<select id="areaCodeToName" parameterType="java.util.List" resultType="string">
+        SELECT area_name
+        FROM p2_tbl_area_code_s
+        WHERE area_sq IN
+        <foreach item="item" index="index" collection="list" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </select>
+
+	<select id="jobCodeToName" parameterType="java.util.List" resultType="string">
+        SELECT job_sc_name
+        FROM p2_tbl_job_code_s
+        WHERE job_sq IN
+        <foreach item="item" index="index" collection="list" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </select>
+
+	<select id="skillCodeToName" parameterType="java.util.List" resultType="string">
+        SELECT skl_sc_name
+        FROM p2_tbl_skill_code_s
+        WHERE skl_cd_sq IN
+        <foreach item="item" index="index" collection="list" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </select>
+
+
+	<!-- @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@tools END@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ -->
+	
+	
+</mapper>
