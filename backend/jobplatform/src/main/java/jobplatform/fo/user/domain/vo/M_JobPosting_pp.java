@@ -25,7 +25,7 @@ public class M_JobPosting_pp {
 
     @Override
     public String toString(){
-        return jbp_tl+jbp_cntnt+cr+edctn+entrprs_name+area_sq+job_sq+skl_cd_sq;
+        return jbp_tl+jbp_cntnt+cr+edctn+entrprs_name+areas+jobs+skills;
     }
 
 }

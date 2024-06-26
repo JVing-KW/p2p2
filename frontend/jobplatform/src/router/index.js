@@ -1,5 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import MypageMain from '../views/fo/user/MypageMain.vue'
+import MypageMain from '../views/fo/user/MypageView.vue'
 
 const routes = [
   {path : '/', component:MypageMain}
