@@ -4,12 +4,12 @@ package jobplatform.fo.user.domain.mapper;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
+import org.springframework.stereotype.Repository;
 
 import jobplatform.fo.user.domain.vo.M_JobPosting_pp;
 
-@Mapper
+@Repository
 public interface M_MypageMapper {
 	
 //	회원 정보 중 이름, 전화번호, 이메일, 포지션 제안 수락여부
@@ -67,7 +67,12 @@ public interface M_MypageMapper {
 //	포지션 제안 받은 공고 리스트 출력
 	public List<M_JobPosting_pp> getPPJopPostingData(@Param("rsm_sq") int rsm_sq);
 
-
+//	공고-지역 관계 가지고오기
+	public List<Integer> getAreasOfJobPost(int jbp_sq);
+//	공고-직업 관계 가지고오기
+	public List<Integer> getJobsOfJobPost(int jbp_sq);
+//	공고-스킬 관계 가지고오기
+	public List<Integer> getSkillsOfJobPost(int jbp_sq);
 
 // 	@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@tools@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 //	대표이력서 rsm_sq 구하는 메서드

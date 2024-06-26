@@ -21,7 +21,7 @@ import jobplatform.fo.user.service.M_MypageService;
 
 
 @RestController
-@RequestMapping("/mypage")
+@RequestMapping("/user/mypage")
 public class M_MypageController {
 	
 	@Autowired
@@ -29,7 +29,7 @@ public class M_MypageController {
 	
 	//마이페이지 메인 화면 데이터
 	//jwt 구현 전 까지 클라에서 mbr_sq 같이 넘겨주는 걸로!
-	@GetMapping("/main")
+	@GetMapping("/")
 	public ResponseEntity<Map<String, Object>> getMainData(@RequestParam("mbr_sq") int mbr_sq, @RequestParam("month") int month) {
 		return ResponseEntity.ok(myPageService.getMyPageMainData(mbr_sq, month));
 	}

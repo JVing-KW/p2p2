@@ -18,9 +18,9 @@ public class M_JobPosting_pp {
     private Timestamp prpsl_dtm;
     private int pstn_prpsl_cndtn;
     private String entrprs_name;
-    private List<Integer> area_sq;
-    private List<Integer> job_sq;
-    private List<Integer> skl_cd_sq;
+    private List<String> areas;
+    private List<String> jobs;
+    private List<String> skills;
     private String forSeacrch;
 
     @Override

@@ -74,16 +74,6 @@ public class M_MypageServiceImpl implements M_MypageService{
 
         return response;
     }
-    
-    // @Override
-    // public List<Map<String, Object>> getAreaCodes() {
-    //     return mypageMapper.getAreaCodes();
-    // }
-    
-    // @Override
-    // public List<Map<String, Object>> getJobCodes() {
-    //     return mypageMapper.getJobCodes();
-    // }
 
     //포지션 제안 받기 수락 여부 변경
     @Override
@@ -113,8 +103,11 @@ public class M_MypageServiceImpl implements M_MypageService{
     public List<M_JobPosting_pp> getPPJopPostingData(int mbr_sq){
         int rsm_sq = mypageMapper.getRRsm_sq(mbr_sq);
         List<M_JobPosting_pp> result = mypageMapper.getPPJopPostingData(rsm_sq);
-        System.out.println("지수사랑");
         for(M_JobPosting_pp temp : result){
+            int jbp_sq = temp.getJbp_sq();
+            temp.setAreas(mypageMapper.areaCodeToName(mypageMapper.getAreasOfJobPost(jbp_sq)));
+            temp.setJobs(mypageMapper.jobCodeToName(mypageMapper.getJobsOfJobPost(jbp_sq)));
+            temp.setSkills(mypageMapper.skillCodeToName(mypageMapper.getSkillsOfJobPost(jbp_sq)));
             temp.setForSeacrch(temp.toString());
             System.out.println(temp);
         }
@@ -123,21 +116,8 @@ public class M_MypageServiceImpl implements M_MypageService{
     };
 
 
+    //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
-    //tools
-	//회원 번호로 대표 공고 번호 받아오는 메소드
-	//지역, 직업, 스킬 코드 코드 배열을 이름 배열로 바꿔주는 메소드
-    @Override
-    public List<String> areaCodeToName(List<Integer> areas) {
-        return mypageMapper.areaCodeToName(areas);
-    }
-    @Override
-    public List<String> jobCodeToName(List<Integer> jobs) {
-        return mypageMapper.jobCodeToName(jobs);
-    }
-    @Override
-    public List<String> skillCodeToName(List<Integer> skills) {
-        return mypageMapper.skillCodeToName(skills);
-    }
+
 
 }

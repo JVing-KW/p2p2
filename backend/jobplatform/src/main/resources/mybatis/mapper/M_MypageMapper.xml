@@ -184,7 +184,7 @@
 
 	<!-- @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@마이페이지 제안 받은 포지션 리스트 화면 START@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ -->
 	<!-- 바로 아래 select 실행 결과 받을 resultMap -->
-	<resultMap id="jobPostingResultMap" type="jobplatform.fo.user.domain.vo.M_JobPosting_pp">
+	<!-- <resultMap id="jobPostingResultMap" type="jobplatform.fo.user.domain.vo.M_JobPosting_pp">
         <id property="jbp_sq" column="jbp_sq"/>
         <result property="entrprs_sq" column="entrprs_sq"/>
         <result property="jbp_tl" column="jbp_tl"/>
@@ -207,7 +207,7 @@
         </collection>
     </resultMap>
 
-
+	##조인 테이블 너무 많아서.. 카사디안곱으로 연산될 수 밖에 없을듯;; list로 받을 것들 따로 받기
 	<select id="getPPJopPostingData" resultMap="jobPostingResultMap">
 		SELECT 
 			sjp.jbp_sq, sjp.entrprs_sq, sjp.jbp_tl, sjp.jbp_cntnt, sjp.cr, sjp.edctn, sjp.regstr_dln_dtm, sjp.pstn_prpsl_sq, sjp.pstn_prpsl_cndtn,
@@ -224,6 +224,36 @@
 		LEFT OUTER JOIN p2_tbl_job_posting_r jpr ON sjp.jbp_sq = jpr.jbp_sq
 		LEFT OUTER JOIN p2_tbl_skill_code_posting_r spr ON sjp.jbp_sq = spr.jbp_sq
 		ORDER BY sjp.prpsl_dtm DESC
+
+		@@@@@@@@@@LEFT조인을 한번에 안쓰고 결과에 결과에 결과에 하면 될듯@@@@@@@@@
+	</select> -->
+
+	<!-- 포지션 제안 받은 공고 리스트 가져오기 -->
+	<select id="getPPJopPostingData" resultType="jobplatform.fo.user.domain.vo.M_JobPosting_pp">
+		SELECT 
+			sjp.jbp_sq, sjp.entrprs_sq, sjp.jbp_tl, sjp.jbp_cntnt, sjp.cr, sjp.edctn, sjp.regstr_dln_dtm, sjp.pstn_prpsl_sq, sjp.pstn_prpsl_cndtn, sjp.prpsl_dtm, em.entrprs_name
+		FROM
+			(SELECT 
+				jp.jbp_sq, jp.entrprs_sq, jp.jbp_tl, jp.jbp_cntnt, jp.cr, jp.edctn, jp.regstr_dln_dtm, pp.pstn_prpsl_sq, pp.pstn_prpsl_cndtn, pp.prpsl_dtm
+			FROM
+				p2_tbl_job_posting_m jp, p2_tbl_position_proposal_m pp
+			WHERE 
+				jp.jbp_sq IN (SELECT jbp_sq FROM p2_tbl_position_proposal_m WHERE rsm_sq = #{rsm_sq} AND pstn_prpsl_cndtn = 301)) sjp
+		LEFT OUTER JOIN p2_tbl_enterprise_member_m em ON sjp.entrprs_sq = em.entrprs_sq
+		ORDER BY sjp.prpsl_dtm DESC
+	</select>
+
+	<!-- 공고-지역 관계 가지고오기 -->
+	<select id="getAreasOfJobPost">
+		SELECT area_sq FROM p2_tbl_area_posting_r WHERE jbp_sq = #{jbp_sq}
+	</select>
+	<!-- 공고-직업 관계 가지고오기 -->
+	<select id="getJobsOfJobPost">
+		SELECT job_sq FROM p2_tbl_job_posting_r WHERE jbp_sq = #{jbp_sq}
+	</select>
+	<!-- 공고-스킬 관계 가지고오기 -->
+	<select id="getSkillsOfJobPost">
+		SELECT skl_cd_sq FROM p2_tbl_skill_code_posting_r WHERE jbp_sq = #{jbp_sq}
 	</select>
 
 	<!-- @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@마이페이지 제안 받은 포지션 리스트 화면 END@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ -->

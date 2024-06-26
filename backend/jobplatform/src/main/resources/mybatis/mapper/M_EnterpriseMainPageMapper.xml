@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="jobplatform.fo.enterprise.domain.mapper.M_EnterpriseMainPageMapper">
+
+
+
+    <!-- @@@mypage할때도 궁금했는데,,,, 아래 left join 먼저 하고 where절 수행하면 쓸데없는 일 많이 할 거고
+    ,   where절 먼저 수행하고 그 결과에 조인하면 딱 좋을 듯;; -->
+    <!-- 올린 공고 중 종료되지 않은 공고 간단 정보 가져오기 + 등록일시 내림차순 -->
+    <resultMap id="myJobPostSimpleDataResultMap" type="jobplatform.fo.enterprise.domain.vo.MyJobPostSimpleDataVO">
+        <id property="jbp_sq" column="jbp_sq" />
+        <result property="entrprs_sq" column="entrprs_sq" />
+        <result property="jbp_tl" column="jbp_tl" />
+        <result property="insrt_dtm" column="insrt_dtm" />
+        <result property="jbp_cndtn" column="jbp_cndtn" />
+        <collection property="ApplyConditionCount" ofType="jobplatform.fo.enterprise.domain.vo.ApplyConditionCount">
+            <result property="apy_cndtn" column="apy_cndtn" />
+            <result property="cnt" column="cnt" />
+        </collection>
+    </resultMap>
+    
+    <select id="getMyJobPostSimpleData" resultMap="myJobPostSimpleDataResultMap">    
+        SELECT 
+            jbp_sq, entrprs_sq, jbp_tl, insrt_dtm, jbp_cndtn 
+        FROM 
+            p2_tbl_job_posting_m jpm
+        LEFT JOIN(
+                SELECT jbp_sq, apy_cndtn, COUNT(*) cnt
+                FROM p2_tbl_apply_h
+                GROUP BY jbp_sq, apy_cndtn
+            ) aph
+        ON jpm.jbp_sq = aph.jbp_sq
+        WHERE
+            entrprs_sq = #{entrprs_sq}
+            AND
+            jbp_cndtn != 704
+        ORDER BY 
+            insrt_dtm
+    </select>
+
+    <!-- 공고별 지원 현황 데이터 가져오기
+    <selcet>
+        SELECT jbp_sq, apy_cndtn, COUNT(*) cnt FROM p2_tbl_apply_h WHERE jbq_sq = #{jbp_sq} GROUP BY jbp_sq, apy_cndtn
+    </select> -->
+
+    <!-- 클라한테 jbp_sq만 받고 매칭할 공고 데이터 가져오기 -->
+    <resultMap id="jobPostingResultMap" type="jobplatform.fo.enterprise.domain.vo.JobPostingVO">
+        <id property="jbp_sq" column="jbp_sq" />
+        <result property="edctn" column="edctn" />
+        <result property="slry" column="slry" />
+        <collection property="skl_code_sq" ofType="int" column="skl_code_sq" />
+    </resultMap>
+
+    <selcet id="getJobPostData" resultMap="jobPostingResultMap">
+        SELECT jp.jbp_sq, jp.edctn, jp.slry, scp.skl_cd_sq
+        FROM p2_tbl_job_posting_m jp
+        LEFT JOIN p2_tbl_skill_code_posting_r scp ON jp.jbp_sq = scp.jbp_sq
+        WHERE jp.jbp_sq = #{jbp_sq}
+    </select>
+
+    <!-- 공고별 매칭 이력서 데이터 가져오기 -->
+    <!-- 일단 공고의 지역과 직업 맞는지 확인 후 이력서 내용과 해당 이력서의 스킬, 자격증 데이터 가져오기 -->
+    <!-- 시부랄~~~ 이미 포지션 제안했던 이력서는 빼야되잖아;;;;ㅓ민어리ㅏㅁㄴ러ㅣㅏㅁㄴ어리ㅏ -->
+    <resultMap id="resumeResultMap" type="jobplatform.fo.enterprise.domain.vo.ResumeVO">
+        <id property="rsm_sq" column="rsm_sq" />
+        <result property="mbr_sq" column="mbr_sq" />
+        <result property="rsm_img_file_url" column="rsm_img_file_url" />
+        <result property="rsm_fnl_edctn_cd" column="rsm_fnl_edctn_cd" />
+        <result property="rsm_tl" column="rsm_tl" />
+        <result property="rsm_eml" column="rsm_eml" />
+        <result property="updt_dtm" column="updt_dtm" />
+        <collection property="crtfct_name" ofType="string" column="crtfct_name" />
+        <collection property="skl_cd_sq" ofType="int" column="skl_cd_sq" />
+    </resultMap>
+
+    <!-- 시팔시팔시팔 서울 전체 이딴거 누르면 부모키랑 비교해야되는데??? 시팔시팔ㄹ시파ㅓㅣ나머 @@@@@@일단 나중에 생각하기@@@@@@ -->
+    <selcet id="getMatchResumes" resultMap="resumeResultMap">
+        SELECT SECOND.*, rc.crtfct_name
+        FROM 
+            (
+            SELECT FIRST.*, scr.skl_cd_sq
+            FROM
+                (
+                SELECT r.rsm_sq, r.mbr_sq, r.rsm_img_file_url, r.rsm_fnl_edctn_cd, r.rsm_tl, r.rsm_eml, r.updt_dtm
+                FROM p2_tbl_resume_m r
+                WHERE
+                    r.rsm_rprsntv_yn = 'Y'
+                    AND 
+                    NOT EXISTS (
+                            SELECT 1
+                            FROM p2_tbl_position_proposal_m pp
+                            WHERE pp.rsm_sq = r.rsm_sq AND pp.jbp_sq = #{jbp_sq}
+                        )
+                    AND 
+                    EXISTS (
+                            SELECT 1
+                            FROM p2_tbl_area_member_r am
+                            JOIN p2_tbl_area_posting_r ap ON am.area_sq = ap.area_sq
+                            WHERE am.mbr_sq = r.mbr_sq AND ap.jbp_sq = #{jbp_sq}
+                        )
+                    AND 
+                    EXISTS (
+                            SELECT 1
+                            FROM p2_tbl_job_member_r jm
+                            JOIN p2_tbl_job_posting_r jp ON jm.job_sq = jp.job_sq
+                            WHERE jm.mbr_sq = r.mbr_sq AND jp.jbp_sq = #{jbp_sq}
+                        )
+                ) FIRST
+            LEFT JOIN p2_tbl_skill_code_resume_r scr ON scr.rsm_sq = FIRST.rsm_sq
+            ) SECOND
+        LEFT JOIN p2_tbl_resume_certificate_s rc ON rc.rsm_sq = SECOND.rsm_sq
+    </selcet>
+
+</mapper>

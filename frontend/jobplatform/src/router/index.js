@@ -1,6 +1,8 @@
 import { createRouter, createWebHistory } from 'vue-router'
+import MypageMain from '../views/fo/user/MypageMain.vue'
 
 const routes = [
+  {path : '/', component:MypageMain}
 ]
 
 const router = createRouter({
