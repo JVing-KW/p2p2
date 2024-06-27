@@ -1,6 +1,6 @@
 <template>
     <div class="col-lg-3">
-        <aside class="sidebar">
+        <aside class="sidebar" style="position: fixed;">
             <h5 class="font-weight-semi-bold pt-4">마이페이지</h5>
             <ul class="nav nav-list flex-column mb-5">
                 <li class="nav-item"><a class="nav-link" href="#">현황 및 일정</a></li>

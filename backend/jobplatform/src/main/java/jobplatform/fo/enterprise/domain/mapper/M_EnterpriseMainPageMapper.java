@@ -2,13 +2,13 @@ package jobplatform.fo.enterprise.domain.mapper;
 
 import java.util.List;
 
-import org.springframework.stereotype.Repository;
+import org.apache.ibatis.annotations.Mapper;
 
 import jobplatform.fo.enterprise.domain.vo.JobPostingVO;
 import jobplatform.fo.enterprise.domain.vo.MyJobPostSimpleDataVO;
 import jobplatform.fo.enterprise.domain.vo.ResumeVO;
 
-@Repository
+@Mapper
 public interface M_EnterpriseMainPageMapper {
 
     //기업 매인 페이지 공고 + 공고별 지원 현황 데이터

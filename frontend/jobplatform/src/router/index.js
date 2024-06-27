@@ -1,8 +1,19 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import MypageMain from '../views/fo/user/MypageView.vue'
+import UserMainView from '@/views/fo/user/UserMainView.vue'
+import MypageView from '@/views/fo/user/MypageView.vue'
+import MypageHome from '@/components/fo/user/mypage/MypageHome.vue'
 
 const routes = [
-  {path : '/', component:MypageMain}
+  { path : '/', component : UserMainView},
+  { path : '/mypage',
+    component : MypageView,
+    children:[
+      {
+        path : 'home',
+        component : MypageHome
+      }
+    ]
+  }
 ]
 
 const router = createRouter({

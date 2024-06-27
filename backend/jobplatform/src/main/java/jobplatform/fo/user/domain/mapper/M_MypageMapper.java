@@ -4,12 +4,12 @@ package jobplatform.fo.user.domain.mapper;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
-import org.springframework.stereotype.Repository;
 
 import jobplatform.fo.user.domain.vo.M_JobPosting_pp;
 
-@Repository
+@Mapper
 public interface M_MypageMapper {
 	
 //	회원 정보 중 이름, 전화번호, 이메일, 포지션 제안 수락여부

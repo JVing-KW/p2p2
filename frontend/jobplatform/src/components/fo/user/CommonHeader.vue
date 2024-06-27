@@ -7,7 +7,7 @@
                         <div class="header-row">
                             <div class="header-logo" style="width: 100px; height: 48px;">
                                 <a href="index.html">
-                                    <img alt="Porto" width="100" height="48" data-sticky-width="82" data-sticky-height="40" src="img/jobs-icon.png">
+                                    <img alt="Porto" width="100" height="48" data-sticky-width="82" data-sticky-height="40" src="/img/jobs-icon.png">
                                 </a>
                             </div>
                         </div>
