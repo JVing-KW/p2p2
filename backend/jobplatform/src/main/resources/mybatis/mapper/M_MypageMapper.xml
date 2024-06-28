@@ -77,7 +77,7 @@
 	월별 지원 공고 데이터 AC
 	s.mbr_sq = #{mbr_sq} 서브쿼리로 빼서 필터링 한다음 조인하는게 좋을까?--> 
 	<select id="getToMakeCalendarData">
-		SELECT "S" tbl_type, j.jbp_sq, j.jbp_tl, j.regstr_dln_dtm as dtm
+		SELECT "S" tbl_type, j.jbp_sq, j.jbp_tl, DATE_FORMAT(j.regstr_dln_dtm, '%y-%m-%d') as dtm
 		FROM p2_tbl_scrap_s s,
 			 p2_tbl_job_posting_m j
 		WHERE
@@ -87,7 +87,7 @@
 			AND
 			MONTH(j.regstr_dln_dtm) = #{month}
 		UNION
-		SELECT "I" tbl_type, j.jbp_sq, j.jbp_tl, a.intv_dtm as dtm
+		SELECT "I" tbl_type, j.jbp_sq, j.jbp_tl, DATE_FORMAT(a.intv_dtm, '%y-%m-%d') as dtm
 		FROM p2_tbl_apply_h a,
 			 p2_tbl_job_posting_m j
 		WHERE
@@ -97,7 +97,7 @@
 			AND
 			MONTH(intv_dtm) = #{month}
 		UNION
-		SELECT "PP" tbl_type, j.jbp_sq, j.jbp_tl, j.regstr_dln_dtm as dtm
+		SELECT "PP" tbl_type, j.jbp_sq, j.jbp_tl, DATE_FORMAT(j.regstr_dln_dtm, '%y-%m-%d') as dtm
 		FROM p2_tbl_position_proposal_m p,
 			 p2_tbl_job_posting_m j
 		WHERE 
@@ -105,7 +105,7 @@
 			AND
 			MONTH(j.regstr_dln_dtm) = #{month}
 		UNION
-		SELECT  "AC" tbl_type, j.jbp_sq, j.jbp_tl, a.apy_dtm as dtm
+		SELECT  "AC" tbl_type, j.jbp_sq, j.jbp_tl, DATE_FORMAT(a.apy_dtm, '%y-%m-%d') as dtm
 		FROM p2_tbl_apply_h a,
 			 p2_tbl_job_posting_m j
 		WHERE

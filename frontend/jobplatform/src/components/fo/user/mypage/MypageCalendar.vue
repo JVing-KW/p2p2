@@ -1,25 +1,39 @@
 <template>
-    <FullCalendar :options="calendarOptions"/>
+    <FullCalendar :options="calendarOptions" />
+    <div>
+        <button @click="test"></button>
+    </div>
 </template>
 
 <script setup>
+    import { defineProps } from 'vue'
     import FullCalendar from '@fullcalendar/vue3'
     import dayGridPlugin from '@fullcalendar/daygrid'
-    import interactionPlugin from '@fullcalendar/interaction'
+    // import interactionPlugin from '@fullcalendar/interaction'
+
+    const props = defineProps({
+        events: {
+            type : Array
+        }
+    });
 
     const calendarOptions = {
-        plugins: [dayGridPlugin, interactionPlugin],
+        plugins: [dayGridPlugin],
         initialView: 'dayGridMonth',
-        events: [
-            {title : '면접', date: '2024-06-29'},
-            {title : '면접', date: '2024-06-30'},
-            {title : '면접', date: '2024-06-27'},
-            {title : '면접', date: '2024-06-23'},
-            {title : '서류마감', date: '2024-06-23'},
-            {title : '면접', date: '2024-06-01'},
-            {title : '생일', date: '2024-06-19'},
-            {title : '면접', date: '2024-06-02'},
-            {title : '웅냥냥', date: '2024-06-01'},
-        ]
+        // currentEvents: props.events,
+        eventContent : props.events
     }
+
+    // Watch for changes in props.events and update calendarOptions
+    // watch(() => props.events, (newEvents) => {
+    //         calendarOptions.value = {
+    //         ...calendarOptions.value,
+    //         events: newEvents
+    //     };
+    // });
+
+    function test(){
+        console.log(props.events);
+    }
+
 </script>

@@ -6,9 +6,9 @@
                     <div class="header-column">
                         <div class="header-row">
                             <div class="header-logo" style="width: 100px; height: 48px;">
-                                <a href="index.html">
+                                <router-link to="/">
                                     <img alt="Porto" width="100" height="48" data-sticky-width="82" data-sticky-height="40" src="/img/jobs-icon.png">
-                                </a>
+                                </router-link>
                             </div>
                         </div>
                     </div>
@@ -19,7 +19,17 @@
                                     <nav class="collapse">
                                         <ul class="nav nav-pills" id="mainNav">
                                             <li class="dropdown">
-                                                <a class="dropdown-item dropdown-toggle active current-page-active font-weight-bold" href="index.html">
+                                                <router-link to="/" class="dropdown-item dropdown-toggle font-weight-bold">
+                                                    HOME
+                                                <i class="fas fa-chevron-down"></i></router-link>
+                                            </li>
+                                            <li class="dropdown">
+                                                <router-link to="/board/list/jobPosting" class="dropdown-item dropdown-toggle font-weight-bold">
+                                                    TEST
+                                                <i class="fas fa-chevron-down"></i></router-link>
+                                            </li>
+                                            <li class="dropdown">
+                                                <a class="dropdown-item dropdown-toggle font-weight-bold" href="index.html">
                                                     채용정보
                                                 <i class="fas fa-chevron-down"></i></a>
                                             </li>
@@ -46,9 +56,9 @@
                                                 </ul>
                                             </li>
                                             <li class="dropdown">
-                                                <a class="dropdown-item dropdown-toggle font-weight-bold" href="#">
+                                                <router-link to="/mypage/home" class="dropdown-item dropdown-toggle font-weight-bold ">
                                                     마이페이지
-                                                <i class="fas fa-chevron-down"></i></a>
+                                                <i class="fas fa-chevron-down"></i></router-link>
                                             </li>
                                         </ul>
                                     </nav>

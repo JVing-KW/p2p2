@@ -13,9 +13,13 @@
     "@fullcalendar/interaction": "^6.1.14",
     "@fullcalendar/vue3": "^6.1.14",
     "axios": "^1.7.2",
+    "bootstrap-icons": "^1.11.3",
     "core-js": "^3.8.3",
+    "moment": "^2.30.1",
     "vue": "^3.2.13",
     "vue-router": "^4.0.3",
+    "vue3-cookies": "^1.0.6",
+    "vuejs-paginate-next": "^1.0.2",
     "vuex": "^4.0.0"
   },
   "devDependencies": {

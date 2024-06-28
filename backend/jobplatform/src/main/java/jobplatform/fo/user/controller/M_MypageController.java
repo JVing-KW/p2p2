@@ -42,6 +42,7 @@ public class M_MypageController {
 	}
 
 	//마이페이지 포지션 제안 받기 화면 데이터(대표이력서, 제안 수락 여부, 선택했던 지역&직업 + 지역&직업 데이터)
+	//http://localhost/user/mypage/ppAcception?mbr_sq=1
 	@GetMapping("/ppAcception")
 	public ResponseEntity<Map<String, Object>> getPosionProposalData(@RequestParam("mbr_sq") int mbr_sq) {
 		return ResponseEntity.ok(myPageService.getPosionProposalData(mbr_sq));
