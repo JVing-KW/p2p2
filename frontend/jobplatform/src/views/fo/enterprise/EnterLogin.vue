@@ -120,21 +120,7 @@
   const {cookies } = useCookies();
 
   const router = useRouter();
-  //{} 없으며 오류남.. export default 설정하면 괜찮음
-  // import { enterLogin } from "@/api/enter";
-
-  // import MemberLoginNCallback from "./MemberLoginNCallback.vue";
-  //reactive는 Array, Object, Map, Set    원시타입은 사용하지 못함.
-  //ref()에서는 String
-  // const state = reactive({
-  //   form: {
-  //     mbrId: "",
-  //     mbrPswrd: "",
-  //   },
-  // });
-
-  // const router = useRouter();
-
+ 
   
   const entrprsId = ref("");
   const entrprsPswrd = ref("");
@@ -170,20 +156,7 @@
        .then(async(response) => {
 
      
-        store.commit("setEnter", response.data); // mutation 사용
-
-
-         //쿠키 남겨놓음
-         cookieValue.value = cookies.get("entrprsId"); 
-
-        //  console.log("cookies.get(entrprsId) : " +cookies.get("entrprsId"));
-      // 쿠키 값 가져오기
-      //  console.log(" cookieValue.value : " +  cookieValue.value);
-      // 필요 시 쿠키 삭제
-      // cookies.remove('cookieName');
-  
-     
-        console.log(response.data.status);
+        store.commit("setEnter", response.data); // store에 기업 정보 저장(pk, id)
  
   
        await router.push('/');
@@ -210,17 +183,11 @@
     return state;
   };
   
-  // const naverLogin = async () => {
-  //   const state = generateRandomState();
-  //   const apiURL = `https://nid.naver.com/oauth2.0/authorize?response_type=code&client_id=${client_id}&redirect_uri=${redirect_uri}&state=${state}`;
-  //   window.location.href = apiURL;
-  // };
+
   const naverLogin = async () => {
     const state = generateRandomState();
     const apiURL = `https://nid.naver.com/oauth2.0/authorize?response_type=code&client_id=${client_id}&redirect_uri=${redirect_uri}&state=${state}`;
-    //   router.push(
-    //     `https://nid.naver.com/oauth2.0/authorize?response_type=code&client_id=${client_id}&redirect_uri=${redirect_uri}&state=${state}`
-    //   );
+   
     window.location.href = apiURL;
   };
   </script>

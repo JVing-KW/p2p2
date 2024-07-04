@@ -21,7 +21,7 @@
              -->
           <!-- 제출 이벤트가 페이지를 다시 로드 하지 않습니다 -->
           <!-- <form id="frmSignUp"> -->
-
+            
           <form id="frmSignUp" @submit.prevent="enterRegister">
             <!-- 사업자 번호 입력 -->
             <div class="form-group col">
@@ -196,12 +196,6 @@
                   </div>
                 </div>
               </div>
-              <!-- 약관 동의 모달 팝업-->
-              <!-- <div class="row">
-                              <div class="form-group col">
-                                  <p class="text-2 mb-2">Your personal data will be used to support your experience throughout this website, to manage access to your account, and for other purposes described in our <a href="#" class="text-decoration-none">privacy policy.</a></p>
-                              </div>
-                          </div> -->
 
               <div class="row">
                 <div class="form-group col">
@@ -266,7 +260,6 @@
   const errorEntrprsPrvcyTrmsYn = ref("");
   const errorPswrdConfirm = ref("");
   const errorEmlChck = ref("");
-  // const enterData = ref({});
   
   
   const state = reactive({
@@ -302,10 +295,10 @@
             headers: headers,
           })
           .then((response) => {
+            //사업자 번호 조회 성공 시 match된 숫자 
             if (response.data.match_cnt == 1) {
+              //사업자 번호 성공 후 register form v-if로 보여주기
               numState.value = true;
-              console.log(response.data.match_cnt);
-              console.log("numState:" + numState.value);
             } else {
               // 여기 비동기 통신으로 올바르지 않은 입력으로 표기.
             }
@@ -320,12 +313,9 @@
       }
     }
   });
-  
-  // id 중복체크 만들기 axios로 요청해서 중복체크하기.  
-  // * 중복체크 했을 때 성공한 true 값 보관할 변수
-  // 중복 체크 전에는  watch가 작동하지 않게 만들기
-  //  watch를 보관한 변수가 바뀌면 false 
-  
+
+  // id중복확인
+  // 중복확인 후 entrprsId.value 변경시 다시 중복확인 문구 
     const idCheck = () => {
       axios.get("http://localhost:80/enter/check", {
         params: {
@@ -333,16 +323,12 @@
         }
       }).then(() => {
         entrprsIdYn.value = true;
-        console.log("entrprsIdYn.value:" + entrprsIdYn.value);
         errorEntrprsId.value = "아이디 사용가능";
   
   
       }).catch((error) => {
         entrprsIdYn.value = true;
-        console.log("entrprsIdYn.value:" + entrprsIdYn.value);
-        console.log("error: " + error);
         errorEntrprsId.value = "중복된 아이디입니다";
-  
       }
       );
       watch(entrprsId, (newQuestion, oldQuestion) => {
