@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="jobplatform.fo.user.domain.mapper.MypageMapper">
+	
+	<select id="getJoinCondition" parameterType="int" resultType="java.util.Map">
+		SELECT count(a.apy_sq) 지원완료, a.rsm_sq 이력서번호, r.mbr_sq 회원번호
+		FROM p2_tbl_resume_m as r
+		inner join p2_tbl_apply_h as a 
+		on a.rsm_sq = r.rsm_sq and r.mbr_sq=#{id}
+	</select>
+	
+	<!-- test용 회원순번-->
+	<select id="getid" resultType="Integer">
+		select mbr_sq from p2_tbl_member_m where mbr_id = #{id}
+	</select>
+	
+	<!-- 지원정보 -->
+	<select id="getApplyInfo" parameterType="int" resultType="jobplatform.fo.user.domain.vo.ApplyInfoDTO">
+		SELECT 
+		    a.apy_sq, 
+		    a.rsm_sq, 
+		    r.mbr_sq, 
+		    r.rsm_tl, 
+		    j.jbp_tl, 
+		    a.apy_dtm,
+		    j.jbp_cndtn, 
+		    e.entrprs_name, 
+		    c.code_name,
+		    (select count(a_inner.jbp_sq) 
+		     from p2_tbl_apply_h as a_inner 
+		     where a_inner.jbp_sq = j.jbp_sq) as apply_count
+		FROM 
+		    p2_tbl_resume_m as r
+		inner join 
+		    p2_tbl_apply_h as a 
+		    on a.rsm_sq = r.rsm_sq and r.mbr_sq = #{mbrSq}
+		inner join 
+		    p2_tbl_job_posting_m as j 
+		    on a.jbp_sq = j.jbp_sq
+		inner join 
+		    p2_tbl_enterprise_member_m as e 
+		    on e.entrprs_sq = j.entrprs_sq
+		inner join 
+		    p2_tbl_common_code_dtl_s as c 
+		    on c.code_id = a.apy_cndtn
+	</select>
+	
+	<!-- 지원완료cnt -->
+	<select id="getTotalApplyCount" parameterType="Integer" resultType="Integer">
+		select count(a.apy_sq) 
+			from p2_tbl_apply_h as a
+			inner join 
+				p2_tbl_resume_m as r
+				on a.rsm_sq = r.rsm_sq and r.mbr_sq=#{mbrSq}
+	</select>
+	
+	<!--지원 취소-->
+	<select id="delAppy" parameterType="Integer">
+		update p2_tbl_apply_h set apy_cndtn ='403'  where apy_sq = #{apySq}
+	</select>
+	
+	
+</mapper>
