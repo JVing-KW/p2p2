@@ -39,6 +39,11 @@ const routes = [
   },
   // 기우님 컴포넌트 경로
   {
+    path: '/enter/emlSend',
+    name: 'enterFind',
+    component: EnterFind
+  },
+  {
     path: '/enter/register',
     name: "enterRegister",
     component: EnterMemberRegister
@@ -51,10 +56,6 @@ const routes = [
     path: '/enter/login',
     name: "enterLogin",
     component: EnterLogin
-  }, {
-    path: '/enter/find',
-    name: 'enterFind',
-    componet: EnterFind
   },
   // 세추님 컴포넌트 경로
   {

@@ -133,7 +133,7 @@ public class MemberController {
     }
 
 
-    @PostMapping("/register")
+        @PostMapping("/register")
     public ResponseEntity<String> registerUser(@RequestBody MemberEntity userData) {
         if (userData.getMbrEmlRcvChck() == null || userData.getMbrEmlRcvChck().isEmpty()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("이메일 수신 여부가 누락되었습니다.");
@@ -170,6 +170,7 @@ public class MemberController {
     @ResponseBody
     @PostMapping("/emlRegister")
     public Map<String, Object> emlRegister(@RequestBody Map<String, String> request) {
+        //
         String mbrEmlAdrs = request.get("mbrEmlAdrs");
 
         Map<String, Object> map = new HashMap<>();
@@ -179,6 +180,7 @@ public class MemberController {
             map.put("error", "이메일 주소가 입력되지 않았습니다.");
             return map;
         }
+        //어떻게 메일 보낼지에 대한 설정
 
         JavaMailSenderImpl mailSenderImpl = new JavaMailSenderImpl();
         Properties prop = new Properties();

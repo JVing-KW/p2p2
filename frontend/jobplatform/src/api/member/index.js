@@ -21,7 +21,7 @@ function findMbrPswrd(memberData) {
 
 // 인증코드 이메일 전송 (회원가입)
 function sendEmlRegister(mbrEmlAdrs) {
-   return instance.post('/member/emlRegister', { mbrEmlAdrs });
+   return instance.post('/member/register', { mbrEmlAdrs });
 }
 
 // 인증코드 이메일 전송 (아이디, 비밀번호 찾기)

@@ -10,20 +10,14 @@ const store = createStore({
   mutations: {
     setEnter(state, payLoad) {
       state.enterMember = payLoad;
-      console.log("사용자정보 등록")
-      console.log("state.enterMember : " + state.enterMember.pk);
-      console.log("state.enterMember : " + state.enterMember.entrprsId);
 
     },
     setMember(state, payLoad) {
       state.member = payLoad;
-      sessionStorage.setItem("member", JSON.stringify(payLoad)); // 세션 스토리지에 사용자 정보 저장
-      console.log("사용자정보 등록")
+      sessionStorage.setItem("member", JSON.stringify(payLoad)); 
     },
     clearMember(state) {
       state.member = null;
-      sessionStorage.removeItem("member"); // 세션 스토리지에서 사용자 정보 제거
-      console.log("로그아웃")
     },
     updateMemberInfo(state, updatedInfo) {
       state.member = { ...state.member, ...updatedInfo };
@@ -32,10 +26,10 @@ const store = createStore({
   },
   getters: {
     isLoginMember(state) {
-      return state.member !== null; // 사용자가 로그인 상태인지 여부를 반환
+      return state.member !== null; 
 
     }, isLoginEnter(state) {
-      return state.enterMember !== null; // 사용자가 로그인 상태인지 여부를 반환
+      return state.enterMember !== null;
 
     }
     ,

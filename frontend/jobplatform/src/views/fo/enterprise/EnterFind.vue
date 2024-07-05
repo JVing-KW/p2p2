@@ -29,14 +29,14 @@
                                     <div class="row">
                                         <div class="form-group col">
                                             <label class="form-label text-color-dark text-3">이름 <span class="text-color-danger">*</span></label>
-                                            <input type="text" v-model="mbrName" class="form-control form-control-lg text-4" required>
+                                            <input type="text" v-model="findPswrdData.entrprsPicName" class="form-control form-control-lg text-4" required>
                                             <div v-if="errorMbrName" class="error">{{ errorMbrName }}</div>
                                         </div>
                                     </div>
                                     <div class="row">
                                         <div class="form-group col-9">
                                             <label class="form-label text-color-dark text-3">이메일 <span class="text-color-danger">*</span></label>
-                                            <input type="email" v-model="mbrEmlAdrs" class="form-control form-control-lg text-4" required>
+                                            <input type="email" v-model="findPswrdData.entrprsPicEml" class="form-control form-control-lg text-4" required>
                                             <div v-if="errorMbrEmlAdrs" class="error">{{ errorMbrEmlAdrs }}</div>
                                         </div>
                                         <div class="form-group col-3">
@@ -68,21 +68,21 @@
                                     <div class="row">
                                         <div class="form-group col">
                                             <label class="form-label text-color-dark text-3">아이디 <span class="text-color-danger">*</span></label>
-                                            <input type="text" v-model="mbrId" class="form-control form-control-lg text-4" required placeholder="영문, 숫자를 포함한 4자 이상 20자 이내">
+                                            <input type="text" v-model="findPswrdData.entrprsId" class="form-control form-control-lg text-4" required placeholder="영문, 숫자를 포함한 4자 이상 20자 이내">
                                             <div v-if="errorMbrId" class="error">{{ errorMbrId }}</div>
                                         </div>
                                     </div>
                                     <div class="row">
                                         <div class="form-group col">
                                             <label class="form-label text-color-dark text-3">이름 <span class="text-color-danger">*</span></label>
-                                            <input type="text" v-model="mbrName" class="form-control form-control-lg text-4" required>
+                                            <input type="text" v-model="findPswrdData.entrprsPicName" class="form-control form-control-lg text-4" required>
                                             <div v-if="errorMbrName" class="error">{{ errorMbrName }}</div>
                                         </div>
                                     </div>
                                     <div class="row">
                                         <div class="form-group col-9">
                                             <label class="form-label text-color-dark text-3">이메일 <span class="text-color-danger">*</span></label>
-                                            <input type="email" v-model="mbrEmlAdrs" class="form-control form-control-lg text-4" required>
+                                            <input type="email" v-model="findPswrdData.entrprsPicEml" class="form-control form-control-lg text-4" required>
                                             <div v-if="errorMbrEmlAdrs" class="error">{{ errorMbrEmlAdrs }}</div>
                                         </div>
                                         <div class="form-group col-3">
@@ -121,11 +121,21 @@
 <script setup>
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
-import { sendEmlFind, findMbrId, findMbrPswrd } from '@/api/member';
+import {  findMbrId, findMbrPswrd } from '@/api/member';
+import axios from 'axios';
+import { reactive } from 'vue';
+
+
 
 const mbrId = ref('');
 const mbrName = ref('');
 const mbrEmlAdrs = ref('');
+
+const findPswrdData = reactive({
+    entrprsId: "",
+    entrprsPicName: "",
+    entrprsPicEml: ""
+});
 
 const emailKey = ref('');
 const emailCode = ref('');
@@ -140,19 +150,27 @@ const emlSend = async () => {
     emailCode.value = '';
 
     try {
-        const response = await sendEmlFind(mbrEmlAdrs.value);
-        if (!/^[0-9a-zA-Z]([-_.]?[0-9a-zA-Z])*@[0-9a-zA-Z]([-_.]?[0-9a-zA-Z])*.[a-zA-Z]{2,3}$/.test(mbrEmlAdrs.value)) {
-            errorMbrEmlAdrs.value = '이메일 형식이 올바르지 않습니다.';
-        } else if (response.data.exist) {
-            alert(response.data.exist);
-        } else if (response.status === 200) {
-            alert('인증코드가 발송되었습니다.');
-            const key = response.data.key;
-            alert(key);
-            emailCode.value = key;
-        } else {
-            alert('잘못된 이메일입니다');
-        }
+        axios.post("http://localhost:8080/enter/emlSend", findPswrdData)
+            .then((response) => { 
+                console.log(response);
+
+            })
+            .catch((error) => { 
+
+                console.log(error);
+            })
+        // if (!/^[0-9a-zA-Z]([-_.]?[0-9a-zA-Z])*@[0-9a-zA-Z]([-_.]?[0-9a-zA-Z])*.[a-zA-Z]{2,3}$/.test(mbrEmlAdrs.value)) {
+        //     errorMbrEmlAdrs.value = '이메일 형식이 올바르지 않습니다.';
+        // } else if (response.data.exist) {
+        //     alert(response.data.exist);
+        // } else if (response.status === 200) {
+        //     alert('인증코드가 발송되었습니다.');
+        //     const key = response.data.key;
+        //     alert(key);
+        //     emailCode.value = key;
+        // } else {
+        //     alert('잘못된 이메일입니다');
+        // }
     } catch (error) {
         console.error('이메일 전송 중 오류 발생:', error);
         alert('이메일 전송 중 오류가 발생했습니다.');

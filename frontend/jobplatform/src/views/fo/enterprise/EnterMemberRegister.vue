@@ -21,7 +21,7 @@
              -->
           <!-- 제출 이벤트가 페이지를 다시 로드 하지 않습니다 -->
           <!-- <form id="frmSignUp"> -->
-            
+
           <form id="frmSignUp" @submit.prevent="enterRegister">
             <!-- 사업자 번호 입력 -->
             <div class="form-group col">
@@ -329,6 +329,7 @@
       }).catch((error) => {
         entrprsIdYn.value = true;
         errorEntrprsId.value = "중복된 아이디입니다";
+        console.log("중복 아이디 오류 " + error);
       }
       );
       watch(entrprsId, (newQuestion, oldQuestion) => {

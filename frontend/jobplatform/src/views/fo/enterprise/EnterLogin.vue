@@ -114,10 +114,8 @@
   import axios from "axios";
   import {  ref } from "vue";
   import { useRouter } from "vue-router";
-  import { useCookies } from "vue3-cookies";
   import store from "@/store";
 
-  const {cookies } = useCookies();
 
   const router = useRouter();
  
@@ -125,7 +123,6 @@
   const entrprsId = ref("");
   const entrprsPswrd = ref("");
 
-  const cookieValue = ref("");
 
   
   const handleFocus = (event) => {

@@ -16,6 +16,7 @@ public interface EnterMemberRepository extends JpaRepository<EnterMemberEntity,L
 
 
 
+	boolean existsByEntrprsPicEml(String entrprsPicEml);
 
 	boolean existsByEntrprsId(String entrprsId);
 
